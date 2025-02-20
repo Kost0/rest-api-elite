@@ -12,12 +12,13 @@ type Note struct {
 	Phone       string `json:"phone"`
 	Conclusion  string `json:"conclusion"`
 	ProductName string `json:"productName"`
-	Amount      string `json:"amount"`
+	Amount      int    `json:"amount"`
+	IsDelivered bool   `json:"isDelivered"`
 }
 
 var orders = []Note{
-	{ID: "1", Customer: "me", Address: "tam", Phone: "89999999999", Conclusion: "2024-12-01", ProductName: "Air", Amount: "100"},
-	{ID: "2", Customer: "On", Address: "Tam", Phone: "88005553737", Conclusion: "2024-12-02", ProductName: "Nothing", Amount: "10"},
+	{ID: "1", Customer: "me", Address: "tam", Phone: "89999999999", Conclusion: "2024-12-01", ProductName: "Air", Amount: 100, IsDelivered: true},
+	{ID: "2", Customer: "On", Address: "Tam", Phone: "88005553737", Conclusion: "2024-12-02", ProductName: "Nothing", Amount: 10, IsDelivered: false},
 }
 
 func main() {
@@ -50,7 +51,7 @@ func getOrderByID(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"message": "book not found"})
+	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
 }
 
 func createOrder(c *gin.Context) {
@@ -82,7 +83,7 @@ func updateOrder(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"message": "book not found"})
+	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
 }
 
 func deleteOrder(c *gin.Context) {
@@ -91,10 +92,10 @@ func deleteOrder(c *gin.Context) {
 	for i, order := range orders {
 		if order.ID == id {
 			orders = append(orders[:i], orders[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "book deleted"})
+			c.JSON(http.StatusOK, gin.H{"message": "order deleted"})
 			return
 		}
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"message": "book not found"})
+	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
 }
