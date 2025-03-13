@@ -11,6 +11,18 @@ func getOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
+func getProducts(c *gin.Context) {
+	var products []Product
+	db.Find(&products)
+	c.JSON(http.StatusOK, products)
+}
+
+func getShipments(c *gin.Context) {
+	var shipments []Shipment
+	db.Find(&shipments)
+	c.JSON(http.StatusOK, shipments)
+}
+
 func getOrderByID(c *gin.Context) {
 	id := c.Param("id")
 	var book Order

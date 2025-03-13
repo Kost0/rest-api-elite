@@ -14,15 +14,18 @@ func main() {
 	protected := router.Group("/")
 	protected.Use(authMiddleware())
 	{
-		protected.GET("/orders", getOrders)
+		protected.PUT("/orders/:id", updateOrder)
+		protected.DELETE("/orders/:id", deleteOrder)
 		protected.POST("/orders", createOrder)
 	}
 
+	router.GET("/orders", getOrders)
+
+	router.GET("/products", getProducts)
+
+	router.GET("/shipments", getShipments)
+
 	router.GET("/orders/:id", getOrderByID)
-
-	router.PUT("/orders/:id", updateOrder)
-
-	router.DELETE("/orders/:id", deleteOrder)
 
 	router.Run(":8080")
 }
