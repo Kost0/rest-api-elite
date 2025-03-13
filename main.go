@@ -3,9 +3,26 @@ package main
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"time"
 )
+
+var db *gorm.DB
+
+func initDB() {
+	dsn := "host=localhost user=postgres password=221706 dbname=postgres port=5432 sslmode=disable"
+	var err error
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	// Миграция схемы
+	db.AutoMigrate(&Order{})
+}
 
 type Credentials struct {
 	Username string `json:"username"`
@@ -83,23 +100,19 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-type Note struct {
-	ID          string `json:"id"`
-	Customer    string `json:"customer"`
-	Address     string `json:"address"`
-	Phone       string `json:"phone"`
-	Conclusion  string `json:"conclusion"`
-	ProductName string `json:"productName"`
-	Amount      int    `json:"amount"`
-	IsDelivered bool   `json:"isDelivered"`
-}
-
-var orders = []Note{
-	{ID: "1", Customer: "me", Address: "tam", Phone: "89999999999", Conclusion: "2024-12-01", ProductName: "Air", Amount: 100, IsDelivered: true},
-	{ID: "2", Customer: "On", Address: "Tam", Phone: "88005553737", Conclusion: "2024-12-02", ProductName: "Nothing", Amount: 10, IsDelivered: false},
+type Order struct {
+	ID           uint   `gorm:"primaryKey" json:"id"`
+	Customer     string `json:"customer"`
+	Amount       int    `json:"amount"`
+	Address      string `json:"address"`
+	Code         int    `json:"code"`
+	Phone        string `json:"phone"`
+	Product_name string `json:"product_name"`
 }
 
 func main() {
+	initDB()
+
 	router := gin.Default()
 
 	router.POST("/login", login)
@@ -121,64 +134,50 @@ func main() {
 }
 
 func getOrders(c *gin.Context) {
+	var orders []Order
+	db.Find(&orders)
 	c.JSON(http.StatusOK, orders)
 }
 
 func getOrderByID(c *gin.Context) {
 	id := c.Param("id")
-
-	for _, order := range orders {
-		if order.ID == id {
-			c.JSON(http.StatusOK, order)
-			return
-		}
+	var book Order
+	if err := db.First(&book, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+		return
 	}
-
-	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+	c.JSON(http.StatusOK, book)
 }
 
 func createOrder(c *gin.Context) {
-	var newOrder Note
-
-	if err := c.BindJSON(&newOrder); err != nil {
+	var newBook Order
+	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid request"})
 		return
 	}
-
-	orders = append(orders, newOrder)
-	c.JSON(http.StatusCreated, newOrder)
+	db.Create(&newBook)
+	c.JSON(http.StatusCreated, newBook)
 }
 
 func updateOrder(c *gin.Context) {
 	id := c.Param("id")
-	var updatedOrder Note
-
-	if err := c.BindJSON(&updatedOrder); err != nil {
+	var updatedBook Order
+	if err := c.BindJSON(&updatedBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid request"})
 		return
 	}
-
-	for i, order := range orders {
-		if order.ID == id {
-			orders[i] = updatedOrder
-			c.JSON(http.StatusOK, updatedOrder)
-			return
-		}
+	if err := db.Model(&Order{}).Where("id = ?", id).Updates(updatedBook).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+		return
 	}
-
-	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+	c.JSON(http.StatusOK, updatedBook)
 }
 
 func deleteOrder(c *gin.Context) {
 	id := c.Param("id")
-
-	for i, order := range orders {
-		if order.ID == id {
-			orders = append(orders[:i], orders[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "order deleted"})
-			return
-		}
+	if err := db.Delete(&Order{}, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+		return
 	}
-
-	c.JSON(http.StatusNotFound, gin.H{"message": "order not found"})
+	c.JSON(http.StatusOK, gin.H{"message": "order deleted"})
 }
