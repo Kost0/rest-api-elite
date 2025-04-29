@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"github.com/dgrijalva/jwt-go"
@@ -27,7 +27,7 @@ var users = []Credentials{
 	{Username: "user3", Password: "8068"},
 }
 
-func login(c *gin.Context) {
+func Login(c *gin.Context) {
 	var creds Credentials
 	if err := c.BindJSON(&creds); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid request"})
@@ -54,7 +54,7 @@ func login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func authMiddleware() gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 
