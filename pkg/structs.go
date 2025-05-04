@@ -1,6 +1,8 @@
 package pkg
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"github.com/dgrijalva/jwt-go"
+)
 
 type Credentials struct {
 	Username string `json:"username"`
@@ -34,5 +36,5 @@ type Shipment struct {
 	ID            uint   `gorm:"primaryKey" json:"id"`
 	Order_id      int    `json:"order_id"`
 	Shipment_date string `json:"shipment_date"`
-	amount        int    `json:"amount"`
+	Amount        int    `json:"amount"`
 }

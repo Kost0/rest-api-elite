@@ -16,6 +16,6 @@ func InitDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Миграция схемы
+	log.Println("Connected to data base")
 	db.AutoMigrate(&Order{})
 }

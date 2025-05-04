@@ -30,6 +30,7 @@ var users = []Credentials{
 func Login(c *gin.Context) {
 	var creds Credentials
 	if err := c.BindJSON(&creds); err != nil {
+		LogAction(c, "INVALID_LOGIN_REQUEST", 400)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid request"})
 		return
 	}
@@ -41,16 +42,18 @@ func Login(c *gin.Context) {
 		}
 	}
 	if !found {
+		LogAction(c, "WRONG_INFO", 401)
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 		return
 	}
 
 	token, err := generateToken(creds.Username)
 	if err != nil {
+		LogAction(c, "TOKEN_ERROR", 500)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "could not create token"})
 		return
 	}
-
+	LogAction(c, "SUCCESS_LOGIN", 200)
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
@@ -64,6 +67,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
+			LogAction(c, "WRONG_TOKEN", 401)
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 			c.Abort()
 			return
