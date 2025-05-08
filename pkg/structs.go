@@ -14,6 +14,8 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// Order model info
+// @Description Order information
 type Order struct {
 	ID            uint   `gorm:"primaryKey" json:"id"`
 	Amount        int    `json:"amount"`

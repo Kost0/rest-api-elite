@@ -2,7 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"html/template"
+	_ "rest_api1/docs"
 	"rest_api1/pkg"
 )
 
@@ -15,15 +18,16 @@ import (
 // @contact.url http://www.swagger.io/support
 // @contact.email support@swagger.io
 //
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-//
 // @host localhost:8080
-// @BasePath /rest_api1
+// @BasePath /
 func main() {
 	pkg.InitDB()
 
 	router := gin.Default()
+
+	url := ginSwagger.URL("/swagger/doc.json")
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.Use(pkg.RateLimiter())
 

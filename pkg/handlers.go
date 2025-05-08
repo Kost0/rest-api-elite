@@ -5,6 +5,14 @@ import (
 	"net/http"
 )
 
+// GetOrders godoc
+// @Summary Get all orders in HTML table
+// @Description Returns HTML page with table of all orders
+// @ID get-orders-html
+// @Produce html
+// @Success 200 {string} string "HTML page with orders table"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /orders [get]
 func GetOrders(c *gin.Context) {
 	var orders []Order
 	db.Find(&orders)
