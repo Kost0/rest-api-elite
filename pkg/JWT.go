@@ -27,6 +27,17 @@ var users = []Credentials{
 	{Username: "user3", Password: "8068"},
 }
 
+// Login godoc
+// @Summary Login in system
+// @Description User must enter login and password to get token
+// @Tags Login
+// @ID login
+// @Param data body Credentials true "Users credentials"
+// @Success 200 {string} token
+// @Failure 400 "Invalid request"
+// @Failure 401 "Wrong data"
+// @Failure 500 "Cant generate token"
+// @Router /login [post]
 func Login(c *gin.Context) {
 	var creds Credentials
 	if err := c.BindJSON(&creds); err != nil {

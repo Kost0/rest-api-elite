@@ -14,9 +14,17 @@ import (
 // @description This is a sample server for delivery services.
 // @termsOfService http://swagger.io/terms/
 //
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @tag.name Basic
+// @tag.description "Basic functions"
+//
+// @tag.name HTML
+// @tag.description "Return HTML pages with table"
+//
+// @tag.name Protected
+// @tag.description "Authorization is required for access"
+//
+// @tag.name Login
+// @tag.description "Function for authorization"
 //
 // @host localhost:8080
 // @BasePath /

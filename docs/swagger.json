@@ -4,39 +4,410 @@
         "description": "This is a sample server for delivery services.",
         "title": "REST_API",
         "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
+        "contact": {},
         "version": "1.0"
     },
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
+        "/JSON/orders": {
+            "get": {
+                "description": "Returns JSON with all orders",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Basic"
+                ],
+                "summary": "Get all orders in JSON",
+                "operationId": "get-orders-json",
+                "responses": {
+                    "200": {
+                        "description": "List of orders",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.Order"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/JSON/products": {
+            "get": {
+                "description": "Returns JSON with all products",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Basic"
+                ],
+                "summary": "Get all products in JSON",
+                "operationId": "get-products-json",
+                "responses": {
+                    "200": {
+                        "description": "List of products",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.Product"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/JSON/shipments": {
+            "get": {
+                "description": "Returns JSON with all shipments",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Basic"
+                ],
+                "summary": "Get all shipments in JSON",
+                "operationId": "get-shipments-json",
+                "responses": {
+                    "200": {
+                        "description": "List of shipments",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.Shipment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "User must enter login and password to get token",
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Login in system",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "Users credentials",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "401": {
+                        "description": "Wrong data"
+                    },
+                    "500": {
+                        "description": "Cant generate token"
+                    }
+                }
+            }
+        },
         "/orders": {
             "get": {
                 "description": "Returns HTML page with table of all orders",
                 "produces": [
                     "text/html"
                 ],
+                "tags": [
+                    "HTML"
+                ],
                 "summary": "Get all orders in HTML table",
                 "operationId": "get-orders-html",
                 "responses": {
                     "200": {
-                        "description": "HTML page with orders table",
+                        "description": "HTML page with orders table"
+                    }
+                }
+            },
+            "put": {
+                "description": "Update order by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Protected"
+                ],
+                "summary": "Update order",
+                "operationId": "update-order",
+                "parameters": [
+                    {
+                        "description": "Order data in JSON",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.Order"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Order not found"
+                    }
+                }
+            },
+            "post": {
+                "description": "Make new order and add it to database",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Protected"
+                ],
+                "summary": "Create new order",
+                "operationId": "create-order",
+                "parameters": [
+                    {
+                        "description": "Order data in JSON",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Order"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "string"
                         }
                     }
                 }
             }
+        },
+        "/orders/:id": {
+            "get": {
+                "description": "Return one order with certain id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Basic"
+                ],
+                "summary": "Get order by its id",
+                "operationId": "get-orders-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Order"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete order by its id",
+                "tags": [
+                    "Protected"
+                ],
+                "summary": "Delete order",
+                "operationId": "delete-order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "no content"
+                    },
+                    "404": {
+                        "description": "Order not found"
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "description": "Returns HTML page with table of all products",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "HTML"
+                ],
+                "summary": "Get all products in HTML table",
+                "operationId": "get-products-html",
+                "responses": {
+                    "200": {
+                        "description": "HTML page with products table"
+                    }
+                }
+            }
+        },
+        "/shipments": {
+            "get": {
+                "description": "Returns HTML page with table of all Shipments",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "HTML"
+                ],
+                "summary": "Get all Shipments in HTML table",
+                "operationId": "get-Shipments-html",
+                "responses": {
+                    "200": {
+                        "description": "HTML page with Shipments table"
+                    }
+                }
+            }
         }
-    }
+    },
+    "definitions": {
+        "pkg.Credentials": {
+            "description": "Credentials information",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.Order": {
+            "description": "Order information",
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "code": {
+                    "type": "integer"
+                },
+                "customer": {
+                    "type": "integer"
+                },
+                "delivery_team": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.Product": {
+            "description": "Product information",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pkg.Shipment": {
+            "description": "Shipment information",
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "shipment_date": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "\"Basic functions\"",
+            "name": "Basic"
+        },
+        {
+            "description": "\"Return HTML pages with table\"",
+            "name": "HTML"
+        },
+        {
+            "description": "\"Authorization is required for access\"",
+            "name": "Protected"
+        },
+        {
+            "description": "\"Function for authorization\"",
+            "name": "Login"
+        }
+    ]
 }
